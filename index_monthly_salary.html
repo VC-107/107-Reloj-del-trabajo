@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WORKSPACE — Time & Earnings</title>
+<style>
+:root{--bg:#090812;--panel:rgba(255,255,255,.055);--line:rgba(255,255,255,.12);--text:#f6f3ff;--muted:#aaa4c2;--accent:#a78bfa;--accent2:#7c3aed;--glow:rgba(139,92,246,.22);}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% 0%,var(--glow),transparent 55%),var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif;min-height:100vh;transition:.35s}
+body[data-theme="pastel"]{--bg:#fff8f0;--panel:rgba(255,255,255,.72);--line:rgba(100,70,70,.14);--text:#463b48;--muted:#887b89;--accent:#d18ab8;--accent2:#f0b9cf;--glow:rgba(240,185,207,.35);}
+body[data-theme="minimal"]{--bg:#090909;--panel:rgba(255,255,255,.045);--line:rgba(255,255,255,.13);--text:#f5f5f5;--muted:#999;--accent:#fff;--accent2:#aaa;--glow:rgba(255,255,255,.08);}
+body[data-theme="matcha"]{--bg:#101812;--panel:rgba(255,255,255,.055);--line:rgba(255,255,255,.12);--text:#eff8ef;--muted:#a9b9a9;--accent:#a3d977;--accent2:#5e9c59;--glow:rgba(126,190,100,.2);}
+button,input,select{font:inherit}button{cursor:pointer}
+.top{display:flex;justify-content:space-between;align-items:center;padding:25px clamp(18px,4vw,60px);gap:15px}
+.brand{font-size:13px;letter-spacing:.22em;font-weight:800}.brand span{color:var(--accent)}
+.topright{display:flex;align-items:center;gap:12px}.live{font-size:12px;color:var(--muted);letter-spacing:.08em}.dot{display:inline-block;width:7px;height:7px;background:var(--accent);border-radius:50%;margin-right:7px;box-shadow:0 0 12px var(--accent)}
+.iconbtn{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:13px;width:44px;height:44px;font-size:19px;backdrop-filter:blur(12px)}
+main{width:min(1120px,92vw);margin:2vh auto 35px}
+.clock{text-align:center;margin:3vh 0 4vh}.date{color:var(--muted);font-size:13px;letter-spacing:.14em;text-transform:uppercase}
+.time{font-size:clamp(62px,12vw,132px);font-weight:200;letter-spacing:-.07em;line-height:1.08;font-variant-numeric:tabular-nums;text-shadow:0 0 45px var(--glow)}
+.countdowns{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:17px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:22px;backdrop-filter:blur(16px);box-shadow:0 12px 50px rgba(0,0,0,.06)}
+.label{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.cdnum{font-size:clamp(24px,4vw,42px);letter-spacing:-.04em;font-weight:450;margin:12px 0 6px;font-variant-numeric:tabular-nums}
+.sub{font-size:12px;color:var(--muted)}
+.progressbox{margin:16px 0 17px}.progressmeta{display:flex;justify-content:space-between;color:var(--muted);font-size:12px;margin-bottom:9px}
+.track{height:7px;background:var(--line);border-radius:99px;overflow:hidden}.fill{height:100%;width:0;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:99px;transition:width .5s}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.stat{padding:18px}.money{font-size:clamp(18px,2.5vw,27px);font-weight:600;margin-top:12px;letter-spacing:-.04em}.money small{font-size:12px;color:var(--muted);font-weight:400}
+.lunchnote{text-align:center;color:var(--muted);font-size:13px;margin:22px 0 0;min-height:20px}
+footer{text-align:center;color:var(--muted);font-size:11px;padding:18px 0 30px;letter-spacing:.05em}
+.modalback{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:16px;z-index:5}.modalback.open{display:flex}
+.modal{width:min(650px,100%);max-height:90vh;overflow:auto;background:var(--bg);border:1px solid var(--line);border-radius:24px;padding:25px;box-shadow:0 30px 100px #0006}
+.modalhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}.modal h2{font-size:20px;margin:0}.close{background:none;border:0;color:var(--muted);font-size:25px}
+.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.field{display:flex;flex-direction:column;gap:7px}.field label{font-size:12px;color:var(--muted)}.field input,.field select{width:100%;padding:11px 12px;background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:11px;outline:none}.field input:focus,.field select:focus{border-color:var(--accent)}
+.sectiontitle{font-size:11px;letter-spacing:.14em;color:var(--accent);text-transform:uppercase;margin:22px 0 12px}
+.days{display:flex;gap:7px;flex-wrap:wrap}.day{display:flex;align-items:center;gap:5px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;font-size:12px;color:var(--muted)}.day input{accent-color:var(--accent)}
+.save{width:100%;padding:13px;border:0;border-radius:12px;background:var(--accent);color:#17111f;font-weight:750;margin-top:22px}
+.hint{font-size:11px;color:var(--muted);line-height:1.5;margin-top:12px}
+@media(max-width:650px){.top{padding:18px}.live{display:none}main{margin-top:1vh}.clock{margin:4vh 0}.countdowns{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}.panel{padding:18px}.formgrid{grid-template-columns:1fr 1fr}.stat{padding:16px}}
+@media(max-width:390px){.formgrid{grid-template-columns:1fr}}
+</style>
+</head>
+<body data-theme="dark">
+<header class="top"><div class="brand">WORK<span>SPACE</span> <span style="color:var(--muted);font-weight:400;letter-spacing:.08em">/ TIME & MONEY</span></div><div class="topright"><div class="live"><span class="dot"></span>LIVE · LOCAL TIME</div><button class="iconbtn" id="settingsBtn" aria-label="Settings">⚙</button></div></header>
+<main>
+ <section class="clock"><div class="date" id="date">MONDAY · 09 NOVEMBER 2026</div><div class="time" id="clock">00:00:00</div></section>
+ <section class="countdowns">
+  <div class="panel"><div class="label">☕ <span data-i18n="lunch">Lunch time</span></div><div class="cdnum" id="lunchCountdown">--:--:--</div><div class="sub" id="lunchSub">A little break is on its way.</div></div>
+  <div class="panel"><div class="label">✦ <span data-i18n="off">Off work</span></div><div class="cdnum" id="workCountdown">--:--:--</div><div class="sub" id="workSub">Freedom is getting closer.</div></div>
+ </section>
+ <section class="panel progressbox"><div class="progressmeta"><span data-i18n="progress">WORKDAY PROGRESS</span><span id="progressPct">0%</span></div><div class="track"><div class="fill" id="progressFill"></div></div></section>
+ <section class="stats">
+  <div class="panel stat"><div class="label" data-i18n="today">TODAY EARNED</div><div class="money" id="todayMoney">€0.00</div><div class="sub" data-i18n="todaySub">earned so far</div></div>
+  <div class="panel stat"><div class="label" data-i18n="week">THIS WEEK</div><div class="money" id="weekMoney">€0.00</div><div class="sub" data-i18n="weekSub">week to date</div></div>
+  <div class="panel stat"><div class="label" data-i18n="month">THIS MONTH</div><div class="money" id="monthMoney">€0.00</div><div class="sub" id="monthDays">0 workdays elapsed</div></div>
+  <div class="panel stat"><div class="label" data-i18n="year">THIS YEAR</div><div class="money" id="yearMoney">€0.00</div><div class="sub" id="yearProjection">year-to-date</div></div>
+ </section>
+ <div class="lunchnote" id="fun">✨ One minute closer to your next little break.</div>
+</main><footer>YOUR TIME IS YOURS · MADE FOR YOUR WORKDAY</footer>
+<div class="modalback" id="modal"><div class="modal"><div class="modalhead"><h2>⚙ Settings</h2><button class="close" id="closeBtn">×</button></div>
+ <div class="sectiontitle" data-i18n="appearance">Appearance & language</div><div class="formgrid">
+ <div class="field"><label data-i18n="themeLabel">Theme</label><select id="theme"><option value="dark">Dark Purple</option><option value="pastel">Cute Pastel</option><option value="minimal">Minimal</option><option value="matcha">Matcha</option></select></div>
+ <div class="field"><label data-i18n="langLabel">Language / 语言</label><select id="language"><option value="en">English</option><option value="zh">中文</option><option value="mix">中英混合</option></select></div></div>
+ <div class="sectiontitle" data-i18n="schedule">Your schedule</div><div class="formgrid">
+ <div class="field"><label data-i18n="startLabel">Work starts</label><input type="time" id="start" value="09:00"></div><div class="field"><label data-i18n="lunchLabel">Lunch starts</label><input type="time" id="lunch" value="13:00"></div>
+ <div class="field"><label data-i18n="lunchDurationLabel">Lunch duration (minutes)</label><input type="number" id="lunchDuration" min="0" max="240" value="60"></div><div class="field"><label data-i18n="endLabel">Off work</label><input type="time" id="end" value="18:00"></div></div>
+ <div class="sectiontitle" data-i18n="daysTitle">Working days</div><div class="days" id="days"><label class="day"><input type="checkbox" value="1" checked> Mon</label><label class="day"><input type="checkbox" value="2" checked> Tue</label><label class="day"><input type="checkbox" value="3" checked> Wed</label><label class="day"><input type="checkbox" value="4" checked> Thu</label><label class="day"><input type="checkbox" value="5" checked> Fri</label><label class="day"><input type="checkbox" value="6"> Sat</label><label class="day"><input type="checkbox" value="0"> Sun</label></div>
+ <div class="sectiontitle" data-i18n="salaryTitle">Salary</div><div class="formgrid"><div class="field"><label data-i18n="monthlySalary">Monthly salary (gross)</label><input type="number" id="salary" min="0" step="1" value="2500"></div><div class="field"><label>Currency</label><select id="currency"><option>EUR</option><option>USD</option><option>GBP</option><option>CNY</option><option>JPY</option></select></div></div>
+ <p class="hint">Salary is estimated from monthly gross salary and a Monday–Friday schedule (average 21.67 workdays/month). Taxes, bonuses, holidays and actual payslips are not included. Settings are saved in this browser only.</p>
+ <button class="save" id="saveBtn"><span data-i18n="save">Save settings</span></button></div></div>
+<script>
+const defaults={theme:'dark',language:'en',start:'09:00',lunch:'13:00',lunchDuration:60,end:'18:00',salary:2500,currency:'EUR',days:[1,2,3,4,5]};
+let cfg={...defaults};
+try{cfg={...defaults,...JSON.parse(localStorage.getItem('workspaceSettings')||'{}')};if(cfg.salary==null)cfg.salary=(cfg.rate||12)*173.33}catch(e){}
+const $=id=>document.getElementById(id);
+const translations={
+en:{themeLabel:'Theme',langLabel:'Language',appearance:'Appearance & language',schedule:'Your schedule',startLabel:'Work starts',lunchLabel:'Lunch starts',lunchDurationLabel:'Lunch duration (minutes)',endLabel:'Off work',daysTitle:'Working days',salaryTitle:'Salary',monthlySalary:'Monthly salary (gross)',settingsTitle:'Settings',save:'Save settings',lunch:'Lunch time',off:'Off work',progress:'WORKDAY PROGRESS',today:'TODAY EARNED',todaySub:'earned so far',week:'THIS WEEK',weekSub:'week to date',month:'THIS MONTH',year:'THIS YEAR'},
+zh:{themeLabel:'主题',langLabel:'语言',appearance:'外观与语言',schedule:'工作时间安排',startLabel:'上班时间',lunchLabel:'午餐开始',lunchDurationLabel:'午餐时长（分钟）',endLabel:'下班时间',daysTitle:'工作日（默认双休）',salaryTitle:'工资',monthlySalary:'月薪（税前）',settingsTitle:'设置',save:'保存设置',lunch:'午餐时间',off:'下班时间',progress:'今日工作进度',today:'今日已赚',todaySub:'目前累计',week:'本周已赚',weekSub:'本周累计',month:'本月已赚',year:'今年已赚'},
+mix:{themeLabel:'Theme 主题',langLabel:'Language 语言',appearance:'Appearance 外观',schedule:'Schedule 工作时间',startLabel:'Work starts 上班',lunchLabel:'Lunch starts 午餐',lunchDurationLabel:'Lunch duration 午餐时长',endLabel:'Off work 下班',daysTitle:'Working days 工作日',salaryTitle:'Salary 工资',monthlySalary:'Monthly salary 月薪（税前）',settingsTitle:'Settings 设置',save:'Save 保存',lunch:'Lunch time 午餐',off:'Off work 下班',progress:'WORKDAY PROGRESS 今日进度',today:'TODAY 今日已赚',todaySub:'earned so far 目前累计',week:'THIS WEEK 本周',weekSub:'week to date 本周累计',month:'THIS MONTH 本月',year:'THIS YEAR 今年'}
+};
+function apply(){document.body.dataset.theme=cfg.theme;$('theme').value=cfg.theme;$('language').value=cfg.language;$('start').value=cfg.start;$('lunch').value=cfg.lunch;$('lunchDuration').value=cfg.lunchDuration;$('end').value=cfg.end;$('salary').value=cfg.salary??2500;$('currency').value=cfg.currency;document.querySelectorAll('#days input').forEach(x=>x.checked=cfg.days.includes(+x.value));document.querySelectorAll('[data-i18n]').forEach(x=>x.textContent=translations[cfg.language][x.dataset.i18n]||x.textContent);document.querySelectorAll('[data-day]').forEach(x=>{let names=cfg.language==='zh'?['日','一','二','三','四','五','六']:['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];x.lastChild.textContent=' '+names[+x.dataset.day]})}
+function mins(t){let [h,m]=t.split(':').map(Number);return h*60+m}function at(date,minute){let d=new Date(date);d.setHours(Math.floor(minute/60),minute%60,0,0);return d}
+function isWork(d){return cfg.days.includes(d.getDay())}
+function nextWorkday(from){let d=new Date(from);d.setHours(0,0,0,0);for(let i=0;i<9;i++){if(isWork(d))return d;d.setDate(d.getDate()+1)}return d}
+function fmt(ms){ms=Math.max(0,ms);let s=Math.floor(ms/1000),h=Math.floor(s/3600),m=Math.floor(s%3600/60),sec=s%60;return [h,m,sec].map(x=>String(x).padStart(2,'0')).join(':')}
+function paidMinutes(date,now){if(!isWork(date))return 0;let start=at(date,mins(cfg.start)),end=at(date,mins(cfg.end)),l=at(date,mins(cfg.lunch)),le=new Date(l.getTime()+cfg.lunchDuration*60000);let a=Math.max(start.getTime(),date.toDateString()===now.toDateString()?now.getTime():start.getTime()),b=Math.min(end.getTime(),now.getTime());if(b<=a)return 0;let total=b-a;let overlap=Math.max(0,Math.min(b,le)-Math.max(a,l));return Math.max(0,total-overlap)/60000}
+function scheduled(date){if(!isWork(date))return 0;return Math.max(0,mins(cfg.end)-mins(cfg.start)-cfg.lunchDuration)}
+function workdaysBetween(start,end){let n=0,d=new Date(start);d.setHours(0,0,0,0);while(d<=end){if(isWork(d))n++;d.setDate(d.getDate()+1)}return n}
+function money(v){return new Intl.NumberFormat(cfg.language==='zh'?'zh-CN':'en-'+(cfg.currency==='EUR'?'IE':cfg.currency==='GBP'?'GB':cfg.currency==='USD'?'US':'CN'),{style:'currency',currency:cfg.currency,maximumFractionDigits:2}).format(v)}
+function update(){let now=new Date(),today=new Date(now);today.setHours(0,0,0,0);$('clock').textContent=now.toLocaleTimeString([], {hour12:false});$('date').textContent=now.toLocaleDateString(cfg.language==='zh'?'zh-CN':'en-US',{weekday:'long',day:'2-digit',month:'long',year:'numeric'}).toUpperCase();
+let lunch=at(today,mins(cfg.lunch)),lunchEnd=new Date(lunch.getTime()+cfg.lunchDuration*60000),end=at(today,mins(cfg.end)),start=at(today,mins(cfg.start));
+if(isWork(now)&&now<lunch){$('lunchCountdown').textContent=fmt(lunch-now);$('lunchSub').textContent='Your break is getting closer ☕'}
+else if(isWork(now)&&now<lunchEnd){$('lunchCountdown').textContent='ENJOY ✨';$('lunchSub').textContent='Lunch break in progress'}
+else{$('lunchCountdown').textContent='DONE';$('lunchSub').textContent='Lunch break completed'}
+let target=isWork(now)&&now<end?end:at(nextWorkday(new Date(now.getTime()+86400000)),mins(cfg.end));
+$('workCountdown').textContent=fmt(target-now);$('workSub').textContent=now>=end?'Tomorrow is another day 🌙':'You are doing great. Keep going!';
+let p=0;if(isWork(now)&&now>start&&now<end){p=(now-start)/(end-start)*100}if(now>=end&&isWork(now))p=100;$('progressPct').textContent=Math.round(Math.min(100,Math.max(0,p)))+'%';$('progressFill').style.width=Math.min(100,Math.max(0,p))+'%';
+let monthly=+cfg.salary||0,avgDays=260/12,dailySalary=monthly/avgDays,scheduledHours=Math.max(0,mins(cfg.end)-mins(cfg.start)-cfg.lunchDuration)/60,hourRate=scheduledHours>0?dailySalary/scheduledHours:0,dayEarn=paidMinutes(today,now)/60*hourRate;
+let weekStart=new Date(today);weekStart.setDate(today.getDate()-((today.getDay()+6)%7));let monthStart=new Date(now.getFullYear(),now.getMonth(),1),yearStart=new Date(now.getFullYear(),0,1);
+function earnings(from,to){let sum=0,d=new Date(from);d.setHours(0,0,0,0);while(d<=to){sum+=(d.toDateString()===today.toDateString()?paidMinutes(d,now):scheduled(d))/60*hourRate;d.setDate(d.getDate()+1)}return sum}
+$('todayMoney').textContent=money(dayEarn);$('weekMoney').textContent=money(earnings(weekStart,today));$('monthMoney').textContent=money(earnings(monthStart,today));$('yearMoney').textContent=money(earnings(yearStart,today));
+$('monthDays').textContent=workdaysBetween(monthStart,today)+' workdays elapsed';let remaining=new Date(now.getFullYear(),11,31);let projected=earnings(yearStart,today);let d=new Date(today);d.setDate(d.getDate()+1);while(d<=remaining){projected+=scheduled(d)/60*hourRate;d.setDate(d.getDate()+1)}$('yearProjection').textContent='Projected year-end · '+money(projected);
+let funs=['✨ One minute closer to your next little break.','☕ Your future self says: take that lunch break.','🌱 Progress is progress—even on Mondays.','💸 Tiny seconds, steadily adding up.','🌤️ You are not just working; you are earning your time.'];$('fun').textContent=funs[Math.floor(now.getMinutes()/12)%funs.length];
+}
+$('settingsBtn').onclick=()=>$('modal').classList.add('open');$('closeBtn').onclick=()=>$('modal').classList.remove('open');$('modal').onclick=e=>{if(e.target===$('modal'))$('modal').classList.remove('open')};
+$('theme').onchange=e=>{cfg.theme=e.target.value;document.body.dataset.theme=cfg.theme};
+$('language').onchange=e=>{cfg.language=e.target.value;document.querySelectorAll('[data-i18n]').forEach(x=>x.textContent=translations[cfg.language][x.dataset.i18n])};
+$('saveBtn').onclick=()=>{cfg.theme=$('theme').value;cfg.language=$('language').value;cfg.start=$('start').value;cfg.lunch=$('lunch').value;cfg.lunchDuration=+ $('lunchDuration').value;cfg.end=$('end').value;cfg.salary=+$('salary').value;cfg.currency=$('currency').value;cfg.days=[...document.querySelectorAll('#days input:checked')].map(x=>+x.value);if(!cfg.days.length){alert('Please select at least one working day.');return}localStorage.setItem('workspaceSettings',JSON.stringify(cfg));apply();update();$('modal').classList.remove('open')};
+apply();update();setInterval(update,1000);
+</script></body></html>
